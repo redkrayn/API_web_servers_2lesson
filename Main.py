@@ -4,10 +4,6 @@ import urllib.parse
 from dotenv import load_dotenv
 
 
-load_dotenv()
-token = os.getenv("MY_TOKEN")
-
-
 def shorten_link():
     url = 'https://api.vk.ru/method/utils.getShortLink'
     payload = {"access_token": token, "v": 5.81, "url": link}
@@ -42,6 +38,8 @@ def is_shorten_link():
 
 
 if __name__ == "__main__":
+    load_dotenv()
+    token = os.getenv("MY_TOKEN")
     link = input("Введите ссылку: ")
     if str(is_shorten_link()).isdigit():
         print("Количество переходов по ссылке:", is_shorten_link())
