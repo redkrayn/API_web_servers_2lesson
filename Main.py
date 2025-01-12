@@ -10,10 +10,6 @@ def shorten_link():
     response = requests.get(url, params=payload)
     response.raise_for_status()
     short_link = response.json()
-    try:
-        short_link.get("response").get("short_url")
-    except:
-        return "O_1"
     return short_link.get("response").get("short_url")
 
 
@@ -23,32 +19,42 @@ def count_clicks():
     payload = {"access_token": token, "v": 5.81, "key": urlparse, "interval": "forever"}
     response = requests.get(url, params=payload)
     count_click = response.json()
-    try:
-        count_click.get("response").get("stats")[0]["views"]
-    except:
-        return "O_2"
     return count_click.get("response").get("stats")[0]["views"]
 
 
 def is_shorten_link():
+    urlparse = urllib.parse.urlparse(link).path.replace('/', '')
+    url = 'https://api.vk.ru/method/utils.getLinkStats'
+    payload = {"access_token": token, "v": 5.81, "key": urlparse, "interval": "forever"}
+    response = requests.get(url, params=payload)
+    get_error = response.json()
     if urllib.parse.urlparse(link).netloc == "vk.cc":
-        return count_clicks()
+        if get_error.get('error'):
+            return False
+        else:
+            return True
     else:
-        return shorten_link()
+        return False
 
 
 if __name__ == "__main__":
     load_dotenv()
-    token = os.getenv("MY_TOKEN")
+    token = os.environ["TOKEN_VK_API"]
     link = input("Введите ссылку: ")
-    if str(is_shorten_link()).isdigit():
-        print("Количество переходов по ссылке:", is_shorten_link())
-    elif str(is_shorten_link()) == "O_1":
-        print("Неверный адресс")
-    elif str(is_shorten_link()) == "O_2":
-        print("По ссылке ещё не переходили")
+    if is_shorten_link() == False:
+        try:
+            shorten_link()
+            print("Короткая ссылка", shorten_link())
+        except AttributeError:
+            print("Неверный адресс")
     else:
-        print("Короткая ссылка", is_shorten_link())
+        try:
+            count_clicks()
+            print("Количество переходов по ссылке:", count_clicks())
+        except IndexError:
+            print("По ссылке ещё не переходили")
+
+
 
 
 
