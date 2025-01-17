@@ -28,14 +28,14 @@ def is_shorten_link(token, link):
     payload = {"access_token": token, "v": 5.81, "key": url_path, "interval": "forever"}
     response = requests.get(url, params=payload)
     mistake = response.json()
-    return mistake.get('error') is None
+    return mistake.get('error')
 
 
 def main():
     load_dotenv()
     token = os.environ["VK_API_TOKEN"]
     link = input("Введите ссылку: ")
-    if not is_shorten_link(token, link):
+    if is_shorten_link(token, link):
         try:
             print("Короткая ссылка", shorten_link(token, link))
         except AttributeError:
